@@ -109,15 +109,15 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 		char script_payee[1024];
 		char payee_address[1024];
 
-		stratumlog("[Decker] coind->charity_percent = %f\n",coind->charity_percent);
+		//stratumlog("[Decker] coind->charity_percent = %f\n",coind->charity_percent);
                 //if (coind->charity_percent <= 0)
 		coind->charity_percent = 5; 
-                stratumlog("[Decker] coind->charity_percent = %f\n",coind->charity_percent);
+                //stratumlog("[Decker] coind->charity_percent = %f\n",coind->charity_percent);
 
                 // available = 10 * 100000000;
 		json_int_t charity_amount = (available * coind->charity_percent) / 100;
                 available -= charity_amount;
-                stratumlog("[Decker] available = %d, charity_amount = %d\n",available,charity_amount);
+                //stratumlog("[Decker] available = %d, charity_amount = %d\n",available,charity_amount);
 
 		//if (strlen(coind->charity_address) == 0) {
                 switch (templ->height % 4) {
@@ -130,21 +130,21 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 			case 3: sprintf(coind->charity_address, "37jLjjfUXQU4bdqVzvpUXyzAqPQSmxyByi"); 
 			break;
 		}
-                stratumlog("[Decker] templ->height = %d, templ->height % 4 = %d, devfee_payee = %s\n", templ->height, templ->height % 4, coind->charity_address);
+                //stratumlog("[Decker] templ->height = %d, templ->height % 4 = %d, devfee_payee = %s\n", templ->height, templ->height % 4, coind->charity_address);
 
 		strcpy(payee_address,coind->charity_address);
            	base58_decode(payee_address, script_payee);
-                stratumlog("[Decker] * script_payee = %s\n", script_payee);
+                //stratumlog("[Decker] * script_payee = %s\n", script_payee);
 
 		//}	
 
 		strcat(templ->coinb2, "02");
-                stratumlog("[Decker] 0: templ->coinb2 = %s\n",templ->coinb2);
+                //stratumlog("[Decker] 0: templ->coinb2 = %s\n",templ->coinb2);
 		job_pack_tx(coind, templ->coinb2, available, NULL);
-                stratumlog("[Decker] 1: templ->coinb2 = %s\n",templ->coinb2);
+                //stratumlog("[Decker] 1: templ->coinb2 = %s\n",templ->coinb2);
 
 		//job_pack_tx(coind, templ->coinb2, charity_amount, script_payee);
-                stratumlog("[Decker] 2: script_payee = %s, coind->charity_percent = %f, available = %d, charity_amount = %d\n",script_payee, coind->charity_percent, available, charity_amount);
+                //stratumlog("[Decker] 2: script_payee = %s, coind->charity_percent = %f, available = %d, charity_amount = %d\n",script_payee, coind->charity_percent, available, charity_amount);
 
                 char echarity_amount[32];
 		encode_tx_value(echarity_amount, charity_amount);
@@ -181,9 +181,9 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
                 CScript script = CScript() << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
                 return script; */
 
-                stratumlog("[Decker] 2: templ->coinb2 = %s\n",templ->coinb2);
+                //stratumlog("[Decker] 2: templ->coinb2 = %s\n",templ->coinb2);
 		strcat(templ->coinb2, "00000000"); // locktime
-                stratumlog("[Decker] 3: templ->coinb2 = %s\n",templ->coinb2);
+                //stratumlog("[Decker] 3: templ->coinb2 = %s\n",templ->coinb2);
 		coind->reward = (double)available/100000000*coind->reward_mul;
 		return;
 	}
