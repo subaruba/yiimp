@@ -78,7 +78,7 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 	char script1[4*1024];
 	sprintf(script1, "%s%s%s08", eheight, templ->flags, etime);
 
-	char script2[32] = "7969696d7000"; // "yiimp\0" in hex ascii
+        char script2[32] =   "4465636b657200";
 
 	if(!coind->pos && !coind->isaux && templ->auxs_size)
 		coinbase_aux(templ, script2);
@@ -87,7 +87,7 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 	sprintf(templ->coinb1, "%s%s01"
 		"0000000000000000000000000000000000000000000000000000000000000000"
 		"ffffffff%02x%s", eversion1, entime, script_len, script1);
-
+	stratumlog("[Decker] script_len = %02x, script1 = %s\n", script_len, script1);
 	sprintf(templ->coinb2, "%s00000000", script2);
 
 	json_int_t available = templ->value;
@@ -104,6 +104,88 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 			coind->charity_percent = 10;
 		if (strlen(coind->charity_address) == 0)
 			sprintf(coind->charity_address, "BCDrF1hWdKTmrjXXVFTezPjKBmGigmaXg5");
+	}
+	else if(strcmp(coind->symbol, "STAK") == 0) {
+		char script_payee[1024];
+		char payee_address[1024];
+
+		stratumlog("[Decker] coind->charity_percent = %f\n",coind->charity_percent);
+                //if (coind->charity_percent <= 0)
+		coind->charity_percent = 5; 
+                stratumlog("[Decker] coind->charity_percent = %f\n",coind->charity_percent);
+
+                // available = 10 * 100000000;
+		json_int_t charity_amount = (available * coind->charity_percent) / 100;
+                available -= charity_amount;
+                stratumlog("[Decker] available = %d, charity_amount = %d\n",available,charity_amount);
+
+		//if (strlen(coind->charity_address) == 0) {
+                switch (templ->height % 4) {
+			case 0: sprintf(coind->charity_address, "3K3bPrW5h7DYEMp2RcXawTCXajcm4ZU9Zh");  
+			break;
+			case 1: sprintf(coind->charity_address, "33Ssxmn3ehVMgyxgegXhpLGSBpubPjLZQ6"); 
+			break;
+			case 2: sprintf(coind->charity_address, "3HFPNAjesiBY5sSVUmuBFnMEGut69R49ca"); 
+			break;
+			case 3: sprintf(coind->charity_address, "37jLjjfUXQU4bdqVzvpUXyzAqPQSmxyByi"); 
+			break;
+		}
+                stratumlog("[Decker] templ->height = %d, templ->height % 4 = %d, devfee_payee = %s\n", templ->height, templ->height % 4, coind->charity_address);
+
+		strcpy(payee_address,coind->charity_address);
+           	base58_decode(payee_address, script_payee);
+                stratumlog("[Decker] * script_payee = %s\n", script_payee);
+
+		//}	
+
+		strcat(templ->coinb2, "02");
+                stratumlog("[Decker] 0: templ->coinb2 = %s\n",templ->coinb2);
+		job_pack_tx(coind, templ->coinb2, available, NULL);
+                stratumlog("[Decker] 1: templ->coinb2 = %s\n",templ->coinb2);
+
+		//job_pack_tx(coind, templ->coinb2, charity_amount, script_payee);
+                stratumlog("[Decker] 2: script_payee = %s, coind->charity_percent = %f, available = %d, charity_amount = %d\n",script_payee, coind->charity_percent, available, charity_amount);
+
+                char echarity_amount[32];
+		encode_tx_value(echarity_amount, charity_amount);
+                strcat(templ->coinb2, echarity_amount);
+
+                // strcat(templ->coinb2, "0000000000000000");
+                /*
+                switch (templ->height % 4) {
+                	case 0: strcat(templ->coinb2, "17a914be5e65cb7e463900a2d3b2b48e17bac0e086ad6a87"); // OP_HASH160 be5e65cb7e463900a2d3b2b48e17bac0e086ad6a OP_EQUAL
+                	break;
+                	case 1: strcat(templ->coinb2, "17a9141343c8390c5f73d608f4b47e6959d8f3ae86360587"); // OP_HASH160 1343c8390c5f73d608f4b47e6959d8f3ae863605 OP_EQUAL
+                	break;
+                	case 2: strcat(templ->coinb2, "17a914aaa918a4241a9f86145bfe43e933ae8245b19b5487"); // OP_HASH160 aaa918a4241a9f86145bfe43e933ae8245b19b54 OP_EQUAL
+                	break;
+                	case 3: strcat(templ->coinb2, "17a91442414a9eafe62577ee1ace0c0cdb3d02e591a80187"); // OP_HASH160 42414a9eafe62577ee1ace0c0cdb3d02e591a801 OP_EQUAL
+                	break;
+                }*/ 
+
+		char coinb2_part[1024] = {0};
+                char coinb2_len[3] = {0};
+                
+		sprintf(coinb2_part, "a9%02x%s87", (unsigned int) (strlen(script_payee) >> 1) & 0xFF, script_payee );
+		sprintf(coinb2_len, "%02x", (unsigned int) (strlen(coinb2_part) >> 1) & 0xFF );
+		strcat(templ->coinb2,coinb2_len);
+                strcat(templ->coinb2,coinb2_part);
+
+	        /*
+
+		CScript CChainParams::GetTreasuryRewardScriptAtHeight(int nHeight) const {
+	        CStraksAddress address(GetTreasuryRewardAddressAtHeight(nHeight).c_str());
+                assert(address.IsValid());
+                assert(address.IsScript());
+                CScriptID scriptID = boost::get<CScriptID>(address.Get()); // Get() returns a boost variant
+                CScript script = CScript() << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
+                return script; */
+
+                stratumlog("[Decker] 2: templ->coinb2 = %s\n",templ->coinb2);
+		strcat(templ->coinb2, "00000000"); // locktime
+                stratumlog("[Decker] 3: templ->coinb2 = %s\n",templ->coinb2);
+		coind->reward = (double)available/100000000*coind->reward_mul;
+		return;
 	}
 	else if(strcmp(coind->symbol, "XZC") == 0) {
 		char script_payee[1024];
