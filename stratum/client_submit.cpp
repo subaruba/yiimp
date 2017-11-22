@@ -12,6 +12,7 @@ void build_submit_values(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *tem
 {
 	sprintf(submitvalues->coinbase, "%s%s%s%s", templ->coinb1, nonce1, nonce2, templ->coinb2);
 	int coinbase_len = strlen(submitvalues->coinbase);
+        //stratumlog("[Decker] build_submit_values: submitvalues->coinbase = %s\n", submitvalues->coinbase);
 
 	unsigned char coinbase_bin[1024];
 	memset(coinbase_bin, 0, 1024);
@@ -242,6 +243,8 @@ static void client_do_submit(YAAMP_CLIENT *client, YAAMP_JOB *job, YAAMP_JOB_VAL
 		}
 
 		bool b = coind_submit(coind, block_hex);
+                stratumlog("block %s\n", block_hex);
+
 		if(b)
 		{
 			debuglog("*** ACCEPTED %s %d (diff %g) by %s (id: %d)\n", coind->name, templ->height,
