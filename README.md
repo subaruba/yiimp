@@ -53,4 +53,4 @@ Changes for Straks in Yiimp is only related to stratum. So, you need to build **
 - Straks (STAK) - [SdeckerNMSZkLKwHVZVAGuKANbH8bUn7Ye](https://straks.info/address/SdeckerNMSZkLKwHVZVAGuKANbH8bUn7Ye) 
 - Bitcoin (BTC) - [19M4m6jvbiDXrF5vbFk9euTuvx9tN37Naj](https://blockchain.info/address/19M4m6jvbiDXrF5vbFk9euTuvx9tN37Naj) 
 
-**p.s.** Original Yiimp doc you can also find in this branch as README.master.md[README.master.md](./README.master.md)  .
+**p.s.** Original Yiimp doc you can also find in this branch as [README.master.md](./README.master.md)
