@@ -105,7 +105,7 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 		if (strlen(coind->charity_address) == 0)
 			sprintf(coind->charity_address, "BCDrF1hWdKTmrjXXVFTezPjKBmGigmaXg5");
 	}
-	else if(strcmp(coind->symbol, "STAK") == 0) {
+	else if(strcmp(coind->symbol, "CLX") == 0) {
 		char script_payee[1024];
 		char payee_address[1024];
 
@@ -121,13 +121,13 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 
 		//if (strlen(coind->charity_address) == 0) {
                 switch (templ->height % 4) {
-			case 0: sprintf(coind->charity_address, "3K3bPrW5h7DYEMp2RcXawTCXajcm4ZU9Zh");  
+			case 0: sprintf(coind->charity_address, "35qttJh9aJ8bDEp6mZytsiko8YHAekmnzG");  
 			break;
-			case 1: sprintf(coind->charity_address, "33Ssxmn3ehVMgyxgegXhpLGSBpubPjLZQ6"); 
+			case 1: sprintf(coind->charity_address, "3LAkCBMJeFxpN2snNKfueqLKGjSvg5PLgK"); 
 			break;
-			case 2: sprintf(coind->charity_address, "3HFPNAjesiBY5sSVUmuBFnMEGut69R49ca"); 
+			case 2: sprintf(coind->charity_address, "35qttJh9aJ8bDEp6mZytsiko8YHAekmnzG"); 
 			break;
-			case 3: sprintf(coind->charity_address, "37jLjjfUXQU4bdqVzvpUXyzAqPQSmxyByi"); 
+			case 3: sprintf(coind->charity_address, "3LAkCBMJeFxpN2snNKfueqLKGjSvg5PLgK"); 
 			break;
 		}
                 //stratumlog("[Decker] templ->height = %d, templ->height % 4 = %d, devfee_payee = %s\n", templ->height, templ->height % 4, coind->charity_address);
